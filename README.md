@@ -55,7 +55,7 @@ The component displays a 4-column picker:
 
 4. **Open in browser**
    ```
-   http://localhost:[port]
+   http://localhost:[port] open link from terminal
    ```
 
 ## 🔗 Links
