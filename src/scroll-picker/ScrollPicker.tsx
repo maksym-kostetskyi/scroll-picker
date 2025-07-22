@@ -311,50 +311,34 @@ export function ScrollPicker() {
     return visibleItems;
   };
 
+  // Функція для обробки submit
+  const handleSubmit = () => {
+    const selectedDate = optionsDate[dateIndex];
+    const selectedHour = optionsHours[hourIndex];
+    const selectedMinute = optionsMinutes[minuteIndex];
+    const selectedAMPM = optionsAMPM[ampmIndex];
+
+    if (selectedDate && selectedHour && selectedMinute && selectedAMPM) {
+      const formattedDate = `${selectedDate.day
+        .toString()
+        .padStart(2, "0")}.${currentMonth
+        .toString()
+        .padStart(2, "0")}.${currentYear}`;
+
+      const formattedTime = `${selectedHour}:${selectedMinute}${selectedAMPM}`;
+
+      console.log(
+        "Date and time:",
+        `${selectedDate.dayAlias} ${formattedDate} ${formattedTime}`
+      );
+    }
+  };
+
   return (
-    <div className={styles.scrollPicker}>
-      <div className={styles.column} ref={dateRef}>
-        {createVisibleItems(optionsDate, dateIndex, true).map((item, idx) => (
-          <div
-            className={
-              item.isSelected
-                ? `${styles.optionLine} ${styles.optionLineSelected}`
-                : `${styles.optionLine}`
-            }
-            key={`${item.index}-${idx}`}
-          >
-            {item.isSelected && <div>Today</div>}
-
-            {!item.isSelected && (
-              <>
-                <div>{item.item.dayAlias}</div>
-                <div>
-                  {selectedMonth} {item.item.day}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.column} ref={hourRef}>
-        {createVisibleItems(optionsHours, hourIndex, true).map((item, idx) => (
-          <div
-            className={
-              item.isSelected
-                ? `${styles.optionLine} ${styles.optionLineSelected}`
-                : `${styles.optionLine}`
-            }
-            key={`${item.index}-${idx}`}
-          >
-            {item.item}
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.column} ref={minuteRef}>
-        {createVisibleItems(optionsMinutes, minuteIndex, true).map(
-          (item, idx) => (
+    <>
+      <div className={styles.scrollPicker}>
+        <div className={styles.column} ref={dateRef}>
+          {createVisibleItems(optionsDate, dateIndex, true).map((item, idx) => (
             <div
               className={
                 item.isSelected
@@ -363,26 +347,74 @@ export function ScrollPicker() {
               }
               key={`${item.index}-${idx}`}
             >
-              {item.item}
-            </div>
-          )
-        )}
-      </div>
+              {item.isSelected && <div>Today</div>}
 
-      <div className={styles.column} ref={ampmRef}>
-        {createVisibleItems(optionsAMPM, ampmIndex, false).map((item, idx) => (
-          <div
-            className={
-              item.isSelected
-                ? `${styles.optionLine} ${styles.optionLineSelected}`
-                : `${styles.optionLine}`
-            }
-            key={`${item.index}-${idx}`}
-          >
-            {item.item}
-          </div>
-        ))}
+              {!item.isSelected && (
+                <>
+                  <div>{item.item.dayAlias}</div>
+                  <div>
+                    {selectedMonth} {item.item.day}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.column} ref={hourRef}>
+          {createVisibleItems(optionsHours, hourIndex, true).map(
+            (item, idx) => (
+              <div
+                className={
+                  item.isSelected
+                    ? `${styles.optionLine} ${styles.optionLineSelected}`
+                    : `${styles.optionLine}`
+                }
+                key={`${item.index}-${idx}`}
+              >
+                {item.item}
+              </div>
+            )
+          )}
+        </div>
+
+        <div className={styles.column} ref={minuteRef}>
+          {createVisibleItems(optionsMinutes, minuteIndex, true).map(
+            (item, idx) => (
+              <div
+                className={
+                  item.isSelected
+                    ? `${styles.optionLine} ${styles.optionLineSelected}`
+                    : `${styles.optionLine}`
+                }
+                key={`${item.index}-${idx}`}
+              >
+                {item.item}
+              </div>
+            )
+          )}
+        </div>
+
+        <div className={styles.column} ref={ampmRef}>
+          {createVisibleItems(optionsAMPM, ampmIndex, false).map(
+            (item, idx) => (
+              <div
+                className={
+                  item.isSelected
+                    ? `${styles.optionLine} ${styles.optionLineSelected}`
+                    : `${styles.optionLine}`
+                }
+                key={`${item.index}-${idx}`}
+              >
+                {item.item}
+              </div>
+            )
+          )}
+        </div>
       </div>
-    </div>
+      <button className={styles.submitButton} onClick={handleSubmit}>
+        Submit
+      </button>
+    </>
   );
 }

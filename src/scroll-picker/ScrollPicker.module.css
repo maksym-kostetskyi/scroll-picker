@@ -76,3 +76,27 @@
   border-radius: 8px;
   transform: scale(1.1);
 }
+
+.submitButton {
+  margin: 20px auto 0;
+  padding: 12px 24px;
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: block;
+  min-width: 120px;
+}
+
+.submitButton:hover {
+  background: #0056cc;
+}
+
+.submitButton:active {
+  background: #004bb5;
+  transform: scale(0.98);
+}
