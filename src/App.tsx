@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import { ScrollPicker } from "./scroll-picker/ScrollPicker";
 
 function App() {
-  const [date, setDate] = useState(new Date());
-
-  useEffect(() => {
-    const intervalId = setInterval(() => setDate(new Date()), 1);
-    return () => clearInterval(intervalId);
-  }, []);
-
   return (
-    <div>
-      Milliseconds since midnight, January 1, 1970 UTC: {date.getTime()}
-    </div>
+    <Routes>
+      <Route path="/" element={<ScrollPicker />} />
+    </Routes>
   );
 }
 
