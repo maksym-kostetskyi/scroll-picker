@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from "./ScrollPicker.module.css";
 import { getDateOptions } from "./utils/getDateOptions";
+import { useScrollPicker } from "./hooks/useScrollPicker";
 
 export function ScrollPicker() {
   const [searchParams] = useSearchParams();
@@ -44,6 +45,46 @@ export function ScrollPicker() {
   const [minuteIndex, setMinuteIndex] = useState(0);
   const [ampmIndex, setAMPMIndex] = useState(0);
 
+  const dateRef = useRef<HTMLDivElement>(null);
+  const hourRef = useRef<HTMLDivElement>(null);
+  const minuteRef = useRef<HTMLDivElement>(null);
+  const ampmRef = useRef<HTMLDivElement>(null);
+
+  useScrollPicker({
+    ref: dateRef,
+    items: optionsDate,
+    selectedIndex: dateIndex,
+    setSelectedIndex: setDateIndex,
+    onChange: (option) => {
+      setSelectedDay(option.day);
+      setSelectedMonth(months[+(currentMonth ?? "1") - 1]);
+    },
+  });
+
+  useScrollPicker({
+    ref: hourRef,
+    items: optionsHours,
+    selectedIndex: hourIndex,
+    setSelectedIndex: setHourIndex,
+    onChange: setSelectedHour,
+  });
+
+  useScrollPicker({
+    ref: minuteRef,
+    items: optionsMinutes,
+    selectedIndex: minuteIndex,
+    setSelectedIndex: setMinuteIndex,
+    onChange: setselectedMinute,
+  });
+
+  useScrollPicker({
+    ref: ampmRef,
+    items: optionsAMPM,
+    selectedIndex: ampmIndex,
+    setSelectedIndex: setAMPMIndex,
+    onChange: setselectedAMPM,
+  });
+
   useEffect(() => {
     if (currentDay) {
       setSelectedDay(+currentDay);
@@ -56,7 +97,7 @@ export function ScrollPicker() {
 
   return (
     <div className={styles.scrollPicker}>
-      <div className={styles.column}>
+      <div className={styles.column} ref={dateRef}>
         {optionsDate.map((option) => (
           <div
             className={
@@ -79,7 +120,7 @@ export function ScrollPicker() {
         ))}
       </div>
 
-      <div className={styles.column}>
+      <div className={styles.column} ref={hourRef}>
         {optionsHours.map((option) => (
           <div
             className={
@@ -87,12 +128,13 @@ export function ScrollPicker() {
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
+            key={option}
           >
             {option}
           </div>
         ))}
       </div>
-      <div className={styles.column}>
+      <div className={styles.column} ref={minuteRef}>
         {optionsMinutes.map((option) => (
           <div
             className={
@@ -100,12 +142,13 @@ export function ScrollPicker() {
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
+            key={option}
           >
             {option}
           </div>
         ))}
       </div>
-      <div className={styles.column}>
+      <div className={styles.column} ref={ampmRef}>
         {optionsAMPM.map((option) => (
           <div
             className={
@@ -113,6 +156,7 @@ export function ScrollPicker() {
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
+            key={option}
           >
             {option}
           </div>

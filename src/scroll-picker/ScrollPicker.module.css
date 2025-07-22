@@ -7,7 +7,7 @@
 }
 
 .column {
-  overflow-y: scroll;
+  overflow-y: hidden;
   width: fit-content;
 }
 
