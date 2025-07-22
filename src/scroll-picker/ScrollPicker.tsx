@@ -280,6 +280,71 @@ export function ScrollPicker() {
     selectedIndex: number,
     isInfinite: boolean = true
   ) => {
+    if (!isInfinite && items.length <= 2) {
+      // Спеціальна логіка для AM/PM - елементи рухаються один відносно одного
+      const visibleItems = [];
+      const totalVisible = 7;
+
+      for (let i = 0; i < totalVisible; i++) {
+        if (selectedIndex === 0) {
+          // Якщо вибраний AM (індекс 0), то AM по центру, PM внизу
+          if (i === 3) {
+            // Позиція 4 - активний AM
+            visibleItems.push({
+              item: items[0], // AM
+              index: 0,
+              isSelected: true,
+              position: i,
+            });
+          } else if (i === 4) {
+            // Позиція 5 - неактивний PM
+            visibleItems.push({
+              item: items[1], // PM
+              index: 1,
+              isSelected: false,
+              position: i,
+            });
+          } else {
+            // Всі інші позиції - з невидимим контентом для висоти
+            visibleItems.push({
+              item: "&nbsp;" as T,
+              index: -1,
+              isSelected: false,
+              position: i,
+            });
+          }
+        } else {
+          // Якщо вибраний PM (індекс 1), то AM вгорі, PM по центру
+          if (i === 2) {
+            // Позиція 3 - неактивний AM
+            visibleItems.push({
+              item: items[0], // AM
+              index: 0,
+              isSelected: false,
+              position: i,
+            });
+          } else if (i === 3) {
+            // Позиція 4 - активний PM
+            visibleItems.push({
+              item: items[1], // PM
+              index: 1,
+              isSelected: true,
+              position: i,
+            });
+          } else {
+            // Всі інші позиції - з невидимим контентом для висоти
+            visibleItems.push({
+              item: "&nbsp;" as T,
+              index: -1,
+              isSelected: false,
+              position: i,
+            });
+          }
+        }
+      }
+      return visibleItems;
+    }
+
     if (!isInfinite) {
       return items.map((item, index) => ({
         item,
@@ -350,12 +415,19 @@ export function ScrollPicker() {
               {item.isSelected && <div>Today</div>}
 
               {!item.isSelected && (
-                <>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <div>{item.item.dayAlias}</div>
                   <div>
                     {selectedMonth} {item.item.day}
                   </div>
-                </>
+                </div>
               )}
             </div>
           ))}
@@ -402,6 +474,8 @@ export function ScrollPicker() {
                 className={
                   item.isSelected
                     ? `${styles.optionLine} ${styles.optionLineSelected}`
+                    : item.item === "&nbsp;"
+                    ? `${styles.optionLine} ${styles.placeholder}`
                     : `${styles.optionLine}`
                 }
                 key={`${item.index}-${idx}`}

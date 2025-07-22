@@ -1,44 +1,119 @@
 .scrollPicker {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   width: fit-content;
-  height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  height: auto;
   padding: 20px;
   background: #fff;
   position: relative;
   overflow: hidden;
+  align-items: center;
+}
+
+/* Спільний бордер для активних елементів */
+.scrollPicker::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
+  height: 40px;
+  transform: translateY(-50%);
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .column {
-  overflow-y: hidden;
-  width: 120px;
+  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
 }
 
-.column::before,
-.column::after {
+/* Різні ширини для колонок */
+.column:nth-child(1) {
+  width: 160px; /* Дата - найширша */
+  text-align: right;
+  align-items: end;
+}
+
+.column:nth-child(2) {
+  width: 60px; /* Години */
+}
+
+.column:nth-child(3) {
+  width: 60px; /* Хвилини */
+}
+
+.column:nth-child(4) {
+  width: 65px; /* AM/PM */
+}
+
+/* Заповнювачі в AM/PM колонці - повністю невидимі */
+.column:nth-child(4) .placeholder {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Показуємо активний елемент в AM/PM колонці */
+.column:nth-child(4) .optionLine.optionLineSelected {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: scale(1) scaleY(1) perspective(600px) rotateX(0deg);
+  font-size: 26px;
+  color: #000;
+  z-index: 3;
+}
+
+/* Показуємо неактивний AM/PM елемент (сусідній) */
+.column:nth-child(4) .optionLine:not(.optionLineSelected):not(.placeholder) {
+  opacity: 0.8;
+  visibility: visible;
+  transform: scale(0.95) scaleY(0.95) perspective(600px) rotateX(2deg);
+  font-size: 23px;
+  color: #999;
+  pointer-events: none;
+}
+
+/* Ефект затемнення та зжимання до країв (тільки для перших 3 колонок) */
+.column:nth-child(1)::before,
+.column:nth-child(1)::after,
+.column:nth-child(2)::before,
+.column:nth-child(2)::after,
+.column:nth-child(3)::before,
+.column:nth-child(3)::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 80px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95),
+    transparent
+  );
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
-.column::before {
+.column:nth-child(1)::before,
+.column:nth-child(2)::before,
+.column:nth-child(3)::before {
   top: 0;
 }
 
-.column::after {
+.column:nth-child(1)::after,
+.column:nth-child(2)::after,
+.column:nth-child(3)::after {
   bottom: 0;
   transform: rotate(180deg);
 }
@@ -55,26 +130,50 @@
 }
 
 .optionLine {
-  height: 60px;
+  height: auto;
   display: flex;
   gap: 5px;
   align-items: center;
   justify-content: center;
-  flex-direction: row;
-  font-size: 16px;
+  flex-direction: column;
+  font-size: 24px;
   color: #999;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
   user-select: none;
+  position: relative;
+  padding: 0 10px;
+}
+
+/* Ефект вертикального стиснення та легкого нахилу */
+.optionLine:nth-child(1),
+.optionLine:nth-child(7) {
+  transform: scale(0.85) scaleY(0.7) perspective(600px) rotateX(8deg);
+  opacity: 0.4;
+  font-size: 20px;
+}
+
+.optionLine:nth-child(2),
+.optionLine:nth-child(6) {
+  transform: scale(0.9) scaleY(0.85) perspective(600px) rotateX(4deg);
+  opacity: 0.6;
+  font-size: 22px;
+}
+
+.optionLine:nth-child(3),
+.optionLine:nth-child(5) {
+  transform: scale(0.95) scaleY(0.95) perspective(600px) rotateX(2deg);
+  opacity: 0.8;
+  font-size: 23px;
 }
 
 .optionLineSelected {
-  font-weight: bold;
-  font-size: 20px;
+  font-weight: normal;
+  font-size: 26px;
   color: #000;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  transform: scale(1.1);
+  transform: scale(1) scaleY(1) perspective(600px) rotateX(0deg);
+  opacity: 1;
+  z-index: 3;
 }
 
 .submitButton {
