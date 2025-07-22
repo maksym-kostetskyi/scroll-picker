@@ -6,13 +6,13 @@ export function zellerCongruence(
   year: number
 ): DaysOfWeek | null {
   const daysOfWeek: DaysOfWeek[] = [
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
+    "Sat",
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
   ];
 
   if (month === 1) {
@@ -36,8 +36,6 @@ export function zellerCongruence(
       5 * j
   );
   h = h % 7;
-
-  console.log(h);
 
   return daysOfWeek[h] ?? null;
 }
