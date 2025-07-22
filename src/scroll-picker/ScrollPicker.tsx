@@ -7,8 +7,7 @@ import { useScrollPicker } from "./hooks/useScrollPicker";
 export function ScrollPicker() {
   const [searchParams] = useSearchParams();
   const queryToday = searchParams.get("today");
-  const [selectedMonth, setSelectedMonth] = useState("Jan");
-  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState("Jul");
   const months = useMemo(
     () => [
       "Jan",
@@ -26,24 +25,22 @@ export function ScrollPicker() {
     ],
     []
   );
-  const currentDay = queryToday?.split(".")[0];
   const currentMonth = queryToday?.split(".")[1];
   const currentYear = queryToday?.split(".")[2];
   const optionsAMPM = ["AM", "PM"];
   const optionsHours = Array.from({ length: 12 }, (_, i) => i + 1);
-  const optionsMinutes = Array.from({ length: 12 }, (_, i) => i * 5);
-  const optionsDate = getDateOptions(
-    +(currentYear ?? "1970"),
-    +(currentMonth ?? "1")
+  const optionsMinutes = Array.from({ length: 12 }, (_, i) =>
+    String(i * 5).padStart(2, "0")
   );
-  const [selectedHour, setSelectedHour] = useState(1);
-  const [selectedMinute, setselectedMinute] = useState(5);
-  const [selectedAMPM, setselectedAMPM] = useState("AM");
+  const optionsDate = getDateOptions(
+    +(currentYear ?? "2025"),
+    +(currentMonth ?? "7")
+  );
 
   const [dateIndex, setDateIndex] = useState(0);
-  const [hourIndex, setHourIndex] = useState(0);
-  const [minuteIndex, setMinuteIndex] = useState(0);
-  const [ampmIndex, setAMPMIndex] = useState(0);
+  const [hourIndex, setHourIndex] = useState(4); // 5 hours
+  const [minuteIndex, setMinuteIndex] = useState(0); // 00 minutes
+  const [ampmIndex, setAMPMIndex] = useState(1); // PM
 
   const dateRef = useRef<HTMLDivElement>(null);
   const hourRef = useRef<HTMLDivElement>(null);
@@ -55,10 +52,10 @@ export function ScrollPicker() {
     items: optionsDate,
     selectedIndex: dateIndex,
     setSelectedIndex: setDateIndex,
-    onChange: (option) => {
-      setSelectedDay(option.day);
-      setSelectedMonth(months[+(currentMonth ?? "1") - 1]);
+    onChange: () => {
+      setSelectedMonth(months[+(currentMonth ?? "7") - 1]);
     },
+    infiniteScroll: true,
   });
 
   useScrollPicker({
@@ -66,7 +63,7 @@ export function ScrollPicker() {
     items: optionsHours,
     selectedIndex: hourIndex,
     setSelectedIndex: setHourIndex,
-    onChange: setSelectedHour,
+    infiniteScroll: true,
   });
 
   useScrollPicker({
@@ -74,7 +71,7 @@ export function ScrollPicker() {
     items: optionsMinutes,
     selectedIndex: minuteIndex,
     setSelectedIndex: setMinuteIndex,
-    onChange: setselectedMinute,
+    infiniteScroll: true,
   });
 
   useScrollPicker({
@@ -82,38 +79,72 @@ export function ScrollPicker() {
     items: optionsAMPM,
     selectedIndex: ampmIndex,
     setSelectedIndex: setAMPMIndex,
-    onChange: setselectedAMPM,
+    infiniteScroll: false, // AM/PM не має безкінечної прокрутки
   });
 
   useEffect(() => {
-    if (currentDay) {
-      setSelectedDay(+currentDay);
-    }
-
     if (currentMonth) {
       setSelectedMonth(months[parseInt(currentMonth) - 1]);
     }
-  }, [currentDay, currentMonth, currentYear, months]);
+  }, [currentMonth, months]);
+
+  // Функція для створення масиву елементів з додатковими для візуального ефекту
+  const createVisibleItems = <T,>(
+    items: T[],
+    selectedIndex: number,
+    isInfinite: boolean = true
+  ) => {
+    if (!isInfinite) {
+      return items.map((item, index) => ({
+        item,
+        index,
+        isSelected: index === selectedIndex,
+      }));
+    }
+
+    const visibleItems = [];
+    const totalVisible = 7; // показуємо 7 елементів (3 вгорі, 1 вибраний, 3 внизу)
+    const halfVisible = Math.floor(totalVisible / 2);
+
+    for (let i = -halfVisible; i <= halfVisible; i++) {
+      let itemIndex = selectedIndex + i;
+      if (itemIndex < 0) {
+        itemIndex = items.length + itemIndex;
+      } else if (itemIndex >= items.length) {
+        itemIndex = itemIndex - items.length;
+      }
+
+      visibleItems.push({
+        item: items[itemIndex],
+        index: itemIndex,
+        isSelected: i === 0,
+        position: i,
+      });
+    }
+
+    return visibleItems;
+  };
 
   return (
     <div className={styles.scrollPicker}>
       <div className={styles.column} ref={dateRef}>
-        {optionsDate.map((option) => (
+        {createVisibleItems(optionsDate, dateIndex, true).map((item, idx) => (
           <div
             className={
-              option.day === selectedDay
+              item.isSelected
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
-            key={option.day}
+            key={`${item.index}-${idx}`}
           >
-            {option.day === selectedDay && <div>Today</div>}
+            {item.isSelected && <div>Today</div>}
 
-            {option.day !== selectedDay && (
+            {!item.isSelected && (
               <>
-                <div>{option.dayAlias}</div>
-                <div>{selectedMonth}</div>
-                <div>{option.day}</div>
+                <div>{item.item.dayAlias}</div>
+                <div>
+                  {selectedMonth} {item.item.day}
+                </div>
               </>
             )}
           </div>
@@ -121,44 +152,48 @@ export function ScrollPicker() {
       </div>
 
       <div className={styles.column} ref={hourRef}>
-        {optionsHours.map((option) => (
+        {createVisibleItems(optionsHours, hourIndex, true).map((item, idx) => (
           <div
             className={
-              option === selectedHour
+              item.isSelected
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
-            key={option}
+            key={`${item.index}-${idx}`}
           >
-            {option}
+            {item.item}
           </div>
         ))}
       </div>
+
       <div className={styles.column} ref={minuteRef}>
-        {optionsMinutes.map((option) => (
-          <div
-            className={
-              option === selectedMinute
-                ? `${styles.optionLine} ${styles.optionLineSelected}`
-                : `${styles.optionLine}`
-            }
-            key={option}
-          >
-            {option}
-          </div>
-        ))}
+        {createVisibleItems(optionsMinutes, minuteIndex, true).map(
+          (item, idx) => (
+            <div
+              className={
+                item.isSelected
+                  ? `${styles.optionLine} ${styles.optionLineSelected}`
+                  : `${styles.optionLine}`
+              }
+              key={`${item.index}-${idx}`}
+            >
+              {item.item}
+            </div>
+          )
+        )}
       </div>
+
       <div className={styles.column} ref={ampmRef}>
-        {optionsAMPM.map((option) => (
+        {createVisibleItems(optionsAMPM, ampmIndex, false).map((item, idx) => (
           <div
             className={
-              option === selectedAMPM
+              item.isSelected
                 ? `${styles.optionLine} ${styles.optionLineSelected}`
                 : `${styles.optionLine}`
             }
-            key={option}
+            key={`${item.index}-${idx}`}
           >
-            {option}
+            {item.item}
           </div>
         ))}
       </div>
