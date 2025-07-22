@@ -1,0 +1,290 @@
+.scrollPicker {
+  display: flex;
+  gap: 15px;
+  width: fit-content;
+  max-width: 100vw;
+  height: auto;
+  padding: 20px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Мобільна адаптація */
+@media (max-width: 768px) {
+  .scrollPicker {
+    gap: 10px;
+    padding: 15px;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Спільний бордер для активних елементів */
+.scrollPicker::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
+  height: 40px;
+  transform: translateY(-50%);
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.column {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  touch-action: pan-y;
+}
+
+/* Мобільна адаптація колонок */
+@media (max-width: 768px) {
+  .column {
+    min-height: 200px;
+    flex: 1;
+  }
+}
+
+/* Різні ширини для колонок */
+.column:nth-child(1) {
+  width: 160px; /* Дата - найширша */
+  text-align: right;
+  align-items: end;
+}
+
+.column:nth-child(2) {
+  width: 60px; /* Години */
+}
+
+.column:nth-child(3) {
+  width: 60px; /* Хвилини */
+}
+
+.column:nth-child(4) {
+  width: 65px; /* AM/PM */
+}
+
+/* Мобільна адаптація ширини колонок */
+@media (max-width: 768px) {
+  .column:nth-child(1) {
+    width: auto;
+    min-width: 120px;
+    flex: 2;
+    text-align: center;
+    align-items: center;
+  }
+
+  .column:nth-child(2),
+  .column:nth-child(3),
+  .column:nth-child(4) {
+    width: auto;
+    min-width: 50px;
+    flex: 1;
+  }
+}
+
+/* Заповнювачі в AM/PM колонці - повністю невидимі */
+.column:nth-child(4) .placeholder {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Показуємо активний елемент в AM/PM колонці */
+.column:nth-child(4) .optionLine.optionLineSelected {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: scale(1) scaleY(1) perspective(600px) rotateX(0deg);
+  font-size: 26px;
+  color: #000;
+  z-index: 3;
+}
+
+/* Показуємо неактивний AM/PM елемент (сусідній) */
+.column:nth-child(4) .optionLine:not(.optionLineSelected):not(.placeholder) {
+  opacity: 0.8;
+  visibility: visible;
+  transform: scale(0.95) scaleY(0.95) perspective(600px) rotateX(2deg);
+  font-size: 23px;
+  color: #999;
+  pointer-events: none;
+}
+
+/* Ефект затемнення та зжимання до країв (тільки для перших 3 колонок) */
+.column:nth-child(1)::before,
+.column:nth-child(1)::after,
+.column:nth-child(2)::before,
+.column:nth-child(2)::after,
+.column:nth-child(3)::before,
+.column:nth-child(3)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.column:nth-child(1)::before,
+.column:nth-child(2)::before,
+.column:nth-child(3)::before {
+  top: 0;
+}
+
+.column:nth-child(1)::after,
+.column:nth-child(2)::after,
+.column:nth-child(3)::after {
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
+.date {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.current {
+  font-weight: bold;
+}
+
+.optionLine {
+  height: auto;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding: 0 10px;
+}
+
+/* Мобільна адаптація тексту */
+@media (max-width: 768px) {
+  .optionLine {
+    font-size: 20px;
+    padding: 0 5px;
+    gap: 3px;
+  }
+}
+
+/* Ефект вертикального стиснення та легкого нахилу */
+.optionLine:nth-child(1),
+.optionLine:nth-child(7) {
+  transform: scale(0.85) scaleY(0.7) perspective(600px) rotateX(8deg);
+  opacity: 0.4;
+  font-size: 20px;
+}
+
+.optionLine:nth-child(2),
+.optionLine:nth-child(6) {
+  transform: scale(0.9) scaleY(0.85) perspective(600px) rotateX(4deg);
+  opacity: 0.6;
+  font-size: 22px;
+}
+
+.optionLine:nth-child(3),
+.optionLine:nth-child(5) {
+  transform: scale(0.95) scaleY(0.95) perspective(600px) rotateX(2deg);
+  opacity: 0.8;
+  font-size: 23px;
+}
+
+.optionLineSelected {
+  font-weight: normal;
+  font-size: 26px;
+  color: #000;
+  transform: scale(1) scaleY(1) perspective(600px) rotateX(0deg);
+  opacity: 1;
+  z-index: 3;
+}
+
+/* Мобільна адаптація розмірів шрифтів */
+@media (max-width: 768px) {
+  .optionLine:nth-child(1),
+  .optionLine:nth-child(7) {
+    font-size: 16px;
+  }
+
+  .optionLine:nth-child(2),
+  .optionLine:nth-child(6) {
+    font-size: 18px;
+  }
+
+  .optionLine:nth-child(3),
+  .optionLine:nth-child(5) {
+    font-size: 19px;
+  }
+
+  .optionLineSelected {
+    font-size: 22px;
+  }
+
+  .column:nth-child(4) .optionLine.optionLineSelected {
+    font-size: 22px;
+  }
+
+  .column:nth-child(4) .optionLine:not(.optionLineSelected):not(.placeholder) {
+    font-size: 19px;
+  }
+}
+
+.submitButton {
+  margin: 20px auto 0;
+  padding: 12px 24px;
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: block;
+  min-width: 120px;
+}
+
+/* Мобільна адаптація кнопки */
+@media (max-width: 768px) {
+  .submitButton {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 18px;
+    margin: 25px auto 0;
+  }
+}
+
+.submitButton:hover {
+  background: #0056cc;
+}
+
+.submitButton:active {
+  background: #004bb5;
+  transform: scale(0.98);
+}
